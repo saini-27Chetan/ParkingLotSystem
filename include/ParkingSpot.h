@@ -12,7 +12,7 @@ class ParkingSpot{
     Vehicle* vehicle;
 
 public:
-    ParkingSpot(string spotId,string spotType);
+    ParkingSpot(string spotId, string spotType);
 
     string getSpotId();
     string getSpotType();

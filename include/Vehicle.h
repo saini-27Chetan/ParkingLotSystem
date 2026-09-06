@@ -9,7 +9,7 @@ class Vehicle{
     string vehicleType;
     
 public:
-    Vehicle(string registrationNumber,string vehicleType);
+    Vehicle(string registrationNumber, string vehicleType);
 
     string getRegistrationNumber();
     string getVehicleType();

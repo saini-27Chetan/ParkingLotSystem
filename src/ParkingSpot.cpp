@@ -2,7 +2,7 @@
 #include"ParkingSpot.h"
 using namespace std;
 
-ParkingSpot::ParkingSpot(string spotId,string spotType){
+ParkingSpot::ParkingSpot(string spotId, string spotType){
     this->spotId=spotId;
     this->spotType=spotType;
     occupied=false;
