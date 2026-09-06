@@ -4,6 +4,7 @@
 #include"ParkingManager.h"
 #include"parkingStrategy/FirstAvailableSpot.h"
 #include"pricingStrategy/HourlyPrice.h"
+#include"observer/DisplayBoard.h"
 using namespace std;
 
 int main(){
@@ -15,6 +16,12 @@ int main(){
     ParkingSpot* spot2=ParkingSpotFactory::createParkingSpot("A2","Compact");
     ParkingSpot* spot3=ParkingSpotFactory::createParkingSpot("A3","Large");
     ParkingSpot* spot4=ParkingSpotFactory::createParkingSpot("A4","Electric");
+
+    DisplayBoard displayBoard;
+    spot1->addObserver(&displayBoard);
+    spot2->addObserver(&displayBoard);
+    spot3->addObserver(&displayBoard);
+    spot4->addObserver(&displayBoard);
 
     vector<ParkingSpot*> spots;
 

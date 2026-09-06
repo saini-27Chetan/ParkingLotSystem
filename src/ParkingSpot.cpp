@@ -28,14 +28,24 @@ bool ParkingSpot::parkVehicle(Vehicle* vehicle){
     this->vehicle=vehicle;
     occupied=true;
 
+    for(ParkingObserver* observer:observers)
+        observer->update(spotId,occupied);
+
     return true;
 }
 
 void ParkingSpot::removeVehicle(){
     vehicle=nullptr;
     occupied=false;
+
+    for(ParkingObserver* observer:observers)
+        observer->update(spotId,occupied);
 }
 
 Vehicle* ParkingSpot::getVehicle(){
     return vehicle;
+}
+
+void ParkingSpot::addObserver(ParkingObserver* observer){
+    observers.push_back(observer);
 }

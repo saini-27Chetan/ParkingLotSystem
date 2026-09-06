@@ -3,6 +3,7 @@
 
 #include<bits/stdc++.h>
 #include"Vehicle.h"
+#include"observer/ParkingObserver.h"
 using namespace std;
 
 class ParkingSpot{
@@ -10,6 +11,7 @@ class ParkingSpot{
     string spotType;
     bool occupied;
     Vehicle* vehicle;
+    vector<ParkingObserver*> observers;
 
 public:
     ParkingSpot(string spotId, string spotType);
@@ -21,6 +23,7 @@ public:
     bool parkVehicle(Vehicle* vehicle);
     void removeVehicle();
     Vehicle* getVehicle();
+    void addObserver(ParkingObserver* observer);
 };
 
 #endif
