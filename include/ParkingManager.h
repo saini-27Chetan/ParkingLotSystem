@@ -19,7 +19,8 @@ class ParkingManager{
 
 public:
     ParkingManager(vector<ParkingSpot*>& spots, ParkingSpotStrategy* parkingStrategy, PricingStrategy* pricingStrategy);
-
+    ~ParkingManager();
+    
     int getAvailableSpotCount();
     double exitVehicle(string ticketId);
     void setParkingStrategy(ParkingSpotStrategy* parkingStrategy);

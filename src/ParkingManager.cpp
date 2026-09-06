@@ -84,3 +84,8 @@ int ParkingManager::getAvailableSpotCount(){
 
     return count;
 }
+
+ParkingManager::~ParkingManager(){
+    for(Ticket* ticket:activeTickets)
+        delete ticket;
+}

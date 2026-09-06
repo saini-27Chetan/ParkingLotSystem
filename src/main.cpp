@@ -274,6 +274,9 @@ int main(){
             cout<<"Invalid choice\n";
     }
 
+    for(Vehicle* vehicle:vehicles)
+        delete vehicle;
+
     for(ParkingSpot* spot:spots)
         delete spot;
 
