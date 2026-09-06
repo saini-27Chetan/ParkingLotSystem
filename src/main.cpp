@@ -8,6 +8,7 @@
 #include"pricingStrategy/FlatRatePrice.h"
 #include"observer/DisplayBoard.h"
 #include"Logger.h"
+#include"ParkingLot.h"
 using namespace std;
 
 string toUpper(string value){
@@ -33,6 +34,11 @@ void parkVehicle(ParkingManager& parkingManager, vector<Vehicle*>& vehicles){
         cout<<"Invalid vehicle type\n";
         return;
     }
+
+    if(parkingManager.findVehicle(registrationNumber)!=nullptr){
+        cout<<"Vehicle is already parked\n";
+        return;
+    }
     cout<<"\n";
     
     Vehicle* vehicle=VehicleFactory::createVehicle(registrationNumber,vehicleType);
@@ -45,7 +51,7 @@ void parkVehicle(ParkingManager& parkingManager, vector<Vehicle*>& vehicles){
         cout<<"Spot: "<<ticket->getParkingSpot()->getSpotId()<<"\n";
     }
     else{
-        cout<<"Vehicle parking failed\n";
+        cout<<"No suitable parking spot available\n";
         delete vehicle;
     }
 }
@@ -208,23 +214,13 @@ int main(){
     Logger& logger=Logger::getInstance();
     logger.log("Parking Lot System started");
 
-    ParkingSpot* spot1=ParkingSpotFactory::createParkingSpot("A1","Bike");
-    ParkingSpot* spot2=ParkingSpotFactory::createParkingSpot("A2","Compact");
-    ParkingSpot* spot3=ParkingSpotFactory::createParkingSpot("A3","Large");
-    ParkingSpot* spot4=ParkingSpotFactory::createParkingSpot("A4","Electric");
+    ParkingLot parkingLot;
+    vector<ParkingSpot*> spots=parkingLot.createParkingSpots();
 
     DisplayBoard displayBoard;
-    spot1->addObserver(&displayBoard);
-    spot2->addObserver(&displayBoard);
-    spot3->addObserver(&displayBoard);
-    spot4->addObserver(&displayBoard);
 
-    vector<ParkingSpot*> spots;
-
-    spots.push_back(spot1);
-    spots.push_back(spot2);
-    spots.push_back(spot3);
-    spots.push_back(spot4);
+    for(ParkingSpot* spot:spots)
+        spot->addObserver(&displayBoard);
 
     FirstAvailableSpot parkingStrategy;
     NearestSpot nearestSpot;
