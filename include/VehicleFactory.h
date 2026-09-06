@@ -5,7 +5,6 @@
 #include"Vehicle.h"
 using namespace std;
 
-
 class VehicleFactory{
 public:
     static Vehicle* createVehicle(string registrationNumber, string vehicleType);
