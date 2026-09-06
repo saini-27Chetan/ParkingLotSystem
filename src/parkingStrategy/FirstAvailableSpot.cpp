@@ -7,11 +7,11 @@ ParkingSpot* FirstAvailableSpot::findSpot(vector<ParkingSpot*>& spots, string ve
         if(!spot->isOccupied()){
             string spotType=spot->getSpotType();
 
-            if(vehicleType=="Bike" && spotType=="Bike")
+            if(vehicleType=="BIKE" && spotType=="Bike")
                 return spot;
-            if(vehicleType=="Car" && (spotType=="Compact" || spotType=="Large"))
+            if(vehicleType=="CAR" && (spotType=="Compact" || spotType=="Large"))
                 return spot;
-            if(vehicleType=="Electric" && spotType=="Electric")
+            if(vehicleType=="ELECTRIC" && spotType=="Electric")
                 return spot;
         }
     }

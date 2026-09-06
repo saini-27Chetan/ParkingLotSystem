@@ -22,9 +22,12 @@ public:
 
     int getAvailableSpotCount();
     double exitVehicle(string ticketId);
+    void setParkingStrategy(ParkingSpotStrategy* parkingStrategy);
+    void setPricingStrategy(PricingStrategy* pricingStrategy);
     
     Ticket* parkVehicle(Vehicle* vehicle);
     Ticket* findTicket(string ticketId);
+    Ticket* findVehicle(string registrationNumber);
 };
 
 #endif

@@ -9,6 +9,14 @@ ParkingManager::ParkingManager(vector<ParkingSpot*>& spots, ParkingSpotStrategy*
     ticketCounter=1;
 }
 
+void ParkingManager::setParkingStrategy(ParkingSpotStrategy* parkingStrategy){
+    this->parkingStrategy=parkingStrategy;
+}
+
+void ParkingManager::setPricingStrategy(PricingStrategy* pricingStrategy){
+    this->pricingStrategy=pricingStrategy;
+}
+
 Ticket* ParkingManager::parkVehicle(Vehicle* vehicle){
     ParkingSpot* spot=parkingStrategy->findSpot(spots,vehicle->getVehicleType());
 
@@ -52,6 +60,15 @@ double ParkingManager::exitVehicle(string ticketId){
 Ticket* ParkingManager::findTicket(string ticketId){
     for(Ticket* ticket:activeTickets){
         if(ticket->getTicketId()==ticketId)
+            return ticket;
+    }
+
+    return nullptr;
+}
+
+Ticket* ParkingManager::findVehicle(string registrationNumber){
+    for(Ticket* ticket:activeTickets){
+        if(ticket->getVehicle()->getRegistrationNumber()==registrationNumber)
             return ticket;
     }
 
