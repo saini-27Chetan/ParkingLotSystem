@@ -2,9 +2,10 @@
 #include"ParkingManager.h"
 using namespace std;
 
-ParkingManager::ParkingManager(vector<ParkingSpot*>& spots, ParkingSpotStrategy* parkingStrategy){
+ParkingManager::ParkingManager(vector<ParkingSpot*>& spots, ParkingSpotStrategy* parkingStrategy, PricingStrategy* pricingStrategy){
     this->spots=spots;
     this->parkingStrategy=parkingStrategy;
+    this->pricingStrategy=pricingStrategy;
     ticketCounter=1;
 }
 
@@ -26,19 +27,24 @@ Ticket* ParkingManager::parkVehicle(Vehicle* vehicle){
     return ticket;
 }
 
-bool ParkingManager::exitVehicle(string ticketId){
+double ParkingManager::exitVehicle(string ticketId){
     for(int i=0;i<activeTickets.size();i++){
         if(activeTickets[i]->getTicketId()==ticketId){
-            ParkingSpot* spot=activeTickets[i]->getParkingSpot();
+            Ticket* ticket=activeTickets[i];
+            time_t exitTime=time(nullptr);
+            double fee=pricingStrategy->calculatePrice(ticket->getEntryTime(),exitTime);
+
+            ParkingSpot* spot=ticket->getParkingSpot();
             spot->removeVehicle();
-            delete activeTickets[i];
+
+            delete ticket;
             activeTickets.erase(activeTickets.begin()+i);
 
-            return true;
+            return fee;
         }
     }
 
-    return false;
+    return -1;
 }
 
 Ticket* ParkingManager::findTicket(string ticketId){
