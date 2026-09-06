@@ -8,14 +8,14 @@
 #include"parkingStrategy/ParkingSpotStrategy.h"
 #include"pricingStrategy/PricingStrategy.h"
 #include"Logger.h"
+#include"TicketManager.h"
 using namespace std;
 
 class ParkingManager{
     vector<ParkingSpot*> spots;
-    vector<Ticket*> activeTickets;
     ParkingSpotStrategy* parkingStrategy;
     PricingStrategy* pricingStrategy;
-    int ticketCounter;
+    TicketManager* ticketManager;
 
 public:
     ParkingManager(vector<ParkingSpot*>& spots, ParkingSpotStrategy* parkingStrategy, PricingStrategy* pricingStrategy);

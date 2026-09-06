@@ -6,7 +6,7 @@ ParkingManager::ParkingManager(vector<ParkingSpot*>& spots, ParkingSpotStrategy*
     this->spots=spots;
     this->parkingStrategy=parkingStrategy;
     this->pricingStrategy=pricingStrategy;
-    ticketCounter=1;
+    this->ticketManager=new TicketManager();
 }
 
 void ParkingManager::setParkingStrategy(ParkingSpotStrategy* parkingStrategy){
@@ -26,53 +26,37 @@ Ticket* ParkingManager::parkVehicle(Vehicle* vehicle){
     if(!spot->parkVehicle(vehicle))
         return nullptr;
 
-    string ticketId="T"+to_string(ticketCounter);
-    ticketCounter++;
-
-    Ticket* ticket=new Ticket(ticketId,vehicle,spot);
-    activeTickets.push_back(ticket);
+    Ticket* ticket=ticketManager->createTicket(vehicle,spot);
     Logger::getInstance().log("Vehicle parked: "+vehicle->getRegistrationNumber());
 
     return ticket;
 }
 
 double ParkingManager::exitVehicle(string ticketId){
-    for(int i=0;i<activeTickets.size();i++){
-        if(activeTickets[i]->getTicketId()==ticketId){
-            Ticket* ticket=activeTickets[i];
-            time_t exitTime=time(nullptr);
-            double fee=pricingStrategy->calculatePrice(ticket->getEntryTime(),exitTime);
+    Ticket* ticket=ticketManager->findTicket(ticketId);
 
-            ParkingSpot* spot=ticket->getParkingSpot();
-            spot->removeVehicle();
+    if(ticket==nullptr)
+        return -1;
 
-            Logger::getInstance().log("Vehicle exited: "+ticket->getVehicle()->getRegistrationNumber());
-            delete ticket;
-            activeTickets.erase(activeTickets.begin()+i);
+    time_t exitTime=time(nullptr);
+    double fee=pricingStrategy->calculatePrice(ticket->getEntryTime(), exitTime);
 
-            return fee;
-        }
-    }
+    ParkingSpot* spot=ticket->getParkingSpot();
 
-    return -1;
+    string registrationNumber=ticket->getVehicle()->getRegistrationNumber();
+    spot->removeVehicle();
+    ticketManager->removeTicket(ticketId);
+    Logger::getInstance().log("Vehicle exited: "+registrationNumber);
+
+    return fee;
 }
 
 Ticket* ParkingManager::findTicket(string ticketId){
-    for(Ticket* ticket:activeTickets){
-        if(ticket->getTicketId()==ticketId)
-            return ticket;
-    }
-
-    return nullptr;
+    return ticketManager->findTicket(ticketId);
 }
 
 Ticket* ParkingManager::findVehicle(string registrationNumber){
-    for(Ticket* ticket:activeTickets){
-        if(ticket->getVehicle()->getRegistrationNumber()==registrationNumber)
-            return ticket;
-    }
-
-    return nullptr;
+    return ticketManager->findVehicle(registrationNumber);
 }
 
 int ParkingManager::getAvailableSpotCount(){
@@ -86,6 +70,5 @@ int ParkingManager::getAvailableSpotCount(){
 }
 
 ParkingManager::~ParkingManager(){
-    for(Ticket* ticket:activeTickets)
-        delete ticket;
+    delete ticketManager;
 }

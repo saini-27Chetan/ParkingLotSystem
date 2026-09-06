@@ -67,7 +67,7 @@ Enter number of Electric spots: 3
 
 ### 1. Strategy Pattern
 
-Used for parking spot allocation and parking fee calculation. Different strategies can be selected at runtime without changing the parking manager.
+Used for parking spot allocation and parking fee calculation. `ParkingManager` depends on the strategy interfaces, allowing different parking and pricing strategies to be selected or changed at runtime without modifying the existing parking manager logic.
 
 ### 2. Factory Pattern
 
@@ -85,7 +85,7 @@ Used for the Logger to provide a single logging instance throughout the applicat
 
 ### 1. Single Responsibility Principle
 
-Classes are designed to focus on specific responsibilities such as vehicle management, parking spot management, pricing, logging, and parking allocation.
+Classes are designed to focus on specific responsibilities. For example, Vehicle manages vehicle information, ParkingSpot manages parking spot state, TicketManager manages ticket creation and lifecycle, ParkingManager coordinates parking operations, pricing strategies calculate fees, and Logger handles logging.
 
 ### 2. Open/Closed Principle
 
@@ -94,6 +94,28 @@ New parking and pricing strategies can be added without modifying the existing p
 ### 3. Dependency Inversion Principle
 
 ParkingManager depends on parking and pricing strategy abstractions rather than concrete strategy implementations.
+
+## Main Components
+
+- `ParkingManager` — Coordinates vehicle parking, parking spot allocation, vehicle exit, and parking availability.
+
+- `TicketManager` — Handles ticket creation, active ticket storage, ticket search, vehicle search, and ticket removal.
+
+- `ParkingSpot` — Represents an individual parking spot and manages its occupancy state.
+
+- `Vehicle` — Stores vehicle information.
+
+- `PricingStrategy` — Calculates parking fees using different pricing strategies.
+
+- `ParkingSpotStrategy` — Determines which parking spot should be assigned.
+
+- `ParkingSpotFactory` — Creates parking spot objects.
+
+- `VehicleFactory` — Creates vehicle objects.
+
+- `DisplayBoard` — Receives parking availability updates through the Observer pattern.
+
+- `Logger` — Provides centralized logging through the Singleton pattern.
 
 ## Application Workflow
 
