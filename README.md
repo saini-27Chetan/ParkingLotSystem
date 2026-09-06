@@ -115,6 +115,7 @@ Compile the project using g++:
 g++ -std=c++17 -Iinclude src/*.cpp src/parkingStrategy/*.cpp src/pricingStrategy/*.cpp src/observer/*.cpp -o main
 ```
 
+Run:
 ```bash
 ./main.exe
 ```
