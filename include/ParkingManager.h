@@ -7,6 +7,7 @@
 #include"Ticket.h"
 #include"parkingStrategy/ParkingSpotStrategy.h"
 #include"pricingStrategy/PricingStrategy.h"
+#include"Logger.h"
 using namespace std;
 
 class ParkingManager{

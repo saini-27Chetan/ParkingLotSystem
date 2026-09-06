@@ -5,9 +5,13 @@
 #include"parkingStrategy/FirstAvailableSpot.h"
 #include"pricingStrategy/HourlyPrice.h"
 #include"observer/DisplayBoard.h"
+#include"Logger.h"
 using namespace std;
 
 int main(){
+    Logger& logger=Logger::getInstance();
+    logger.log("Parking Lot System started");
+    
     Vehicle* car=VehicleFactory::createVehicle("HR26AB1234","Car");
     Vehicle* bike=VehicleFactory::createVehicle("HR26CD5678","Bike");
     Vehicle* electric=VehicleFactory::createVehicle("HR26EF9012","Electric");

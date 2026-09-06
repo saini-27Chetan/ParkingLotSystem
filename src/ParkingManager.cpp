@@ -23,6 +23,7 @@ Ticket* ParkingManager::parkVehicle(Vehicle* vehicle){
 
     Ticket* ticket=new Ticket(ticketId,vehicle,spot);
     activeTickets.push_back(ticket);
+    Logger::getInstance().log("Vehicle parked: "+vehicle->getRegistrationNumber());
 
     return ticket;
 }
@@ -37,6 +38,7 @@ double ParkingManager::exitVehicle(string ticketId){
             ParkingSpot* spot=ticket->getParkingSpot();
             spot->removeVehicle();
 
+            Logger::getInstance().log("Vehicle exited: "+ticket->getVehicle()->getRegistrationNumber());
             delete ticket;
             activeTickets.erase(activeTickets.begin()+i);
 
