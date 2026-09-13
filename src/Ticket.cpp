@@ -3,10 +3,11 @@
 using namespace std;
 
 
-Ticket::Ticket(string ticketId, Vehicle* vehicle, ParkingSpot* parkingSpot){
+Ticket::Ticket(string ticketId, Vehicle* vehicle, ParkingSpot* parkingSpot, PricingStrategy* pricingStrategy){
     this->ticketId=ticketId;
     this->vehicle=vehicle;
     this->parkingSpot=parkingSpot;
+    this->pricingStrategy = pricingStrategy;
     entryTime=time(nullptr);
 }
 
@@ -24,4 +25,8 @@ ParkingSpot* Ticket::getParkingSpot(){
 
 time_t Ticket::getEntryTime(){
     return entryTime;
+}
+
+PricingStrategy* Ticket::getPricingStrategy(){
+    return pricingStrategy;
 }

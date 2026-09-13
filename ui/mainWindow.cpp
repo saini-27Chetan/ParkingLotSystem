@@ -98,6 +98,27 @@ void MainWindow::parkVehicle(){
     QString vehicleType = vehicleTypeDialog.textValue();
     string regNumber = registrationNumber.toStdString();
     string type = vehicleType.toStdString();
+    QStringList pricingOptions;
+    pricingOptions << "Hourly Pricing"
+                   << "Flat Rate Pricing";
+
+    QInputDialog pricingDialog(this);
+    pricingDialog.setWindowTitle("Park Vehicle");
+    pricingDialog.setLabelText("Select pricing strategy:");
+    pricingDialog.setComboBoxItems(pricingOptions);
+    pricingDialog.setComboBoxEditable(false);
+    pricingDialog.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
+
+    if(pricingDialog.exec() != QDialog::Accepted)
+        return;
+
+    QString pricingChoice = pricingDialog.textValue();
+    PricingStrategy* pricingStrategy = nullptr;
+    if(pricingChoice == "Hourly Pricing")
+        pricingStrategy = hourlyPricingStrategy;
+    else if(pricingChoice == "Flat Rate Pricing")
+        pricingStrategy = flatRatePricingStrategy;
+
     if(parkingManager->findVehicle(regNumber) != nullptr){
         QMessageBox messageBox(this);
         messageBox.setWindowTitle("Vehicle Already Parked");
@@ -109,7 +130,7 @@ void MainWindow::parkVehicle(){
     }
 
     Vehicle* vehicle = VehicleFactory::createVehicle(regNumber, type);
-    Ticket* ticket = parkingManager->parkVehicle(vehicle);
+    Ticket* ticket = parkingManager->parkVehicle(vehicle,pricingStrategy);
     if(ticket == nullptr){
         delete vehicle;
         QMessageBox messageBox(this);
@@ -343,10 +364,12 @@ void MainWindow::changeParkingStrategy(){
     }
 }
 
-MainWindow::MainWindow(ParkingManager* parkingManager, ParkingSpotStrategy* firstAvailableStrategy, ParkingSpotStrategy* nearestStrategy, QWidget* parent) : QMainWindow(parent){
+MainWindow::MainWindow(ParkingManager* parkingManager, ParkingSpotStrategy* firstAvailableStrategy, ParkingSpotStrategy* nearestStrategy, PricingStrategy* hourlyPricingStrategy, PricingStrategy* flatRatePricingStrategy, QWidget* parent) : QMainWindow(parent){
     this->parkingManager = parkingManager;
     this->firstAvailableStrategy = firstAvailableStrategy;
     this->nearestStrategy = nearestStrategy;
+    this->hourlyPricingStrategy = hourlyPricingStrategy;
+    this->flatRatePricingStrategy = flatRatePricingStrategy;
 
     setWindowTitle("Parking Lot System");
     resize(1000, 700);

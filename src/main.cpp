@@ -33,9 +33,8 @@ int main(int argc, char *argv[]){
     HourlyPrice pricingStrategy;
     FlatRatePrice flatRatePrice;
 
-    ParkingManager parkingManager(spots, &parkingStrategy, &pricingStrategy);
-
-    MainWindow window(&parkingManager, &parkingStrategy, &nearestSpot);
+    ParkingManager parkingManager(spots, &parkingStrategy);
+    MainWindow window(&parkingManager, &parkingStrategy, &nearestSpot, &pricingStrategy, &flatRatePrice );
     window.show();
 
     int result = app.exec();
