@@ -7,6 +7,47 @@
 #include <QGridLayout>
 #include "ParkingManager.h"
 #include "ParkingSpot.h"
+using namespace std;
+
+void MainWindow::refreshStatistics(){
+    int totalSpots = parkingManager->getSpots().size();
+    int availableSpots = parkingManager->getAvailableSpotCount();
+    int occupiedSpots = totalSpots - availableSpots;
+
+    totalLabel->setText("Total Spots\n" + QString::number(totalSpots));
+    occupiedLabel->setText("Occupied\n" + QString::number(occupiedSpots));
+    availableLabel->setText("Available\n" + QString::number(availableSpots));
+}
+
+void MainWindow::refreshSpot(std::string spotId){
+    auto buttonIterator = spotButtons.find(spotId);
+    if(buttonIterator == spotButtons.end())
+        return;
+
+    QPushButton* button = buttonIterator->second;
+    for(ParkingSpot* spot : parkingManager->getSpots()){
+        if(spot->getSpotId() != spotId)
+            continue;
+
+        QString text = QString::fromStdString(spot->getSpotId());
+        text += "\n";
+        text += QString::fromStdString(spot->getSpotType());
+        text += "\n";
+
+        if(spot->isOccupied()){
+            text += "OCCUPIED";
+            if(spot->getVehicle() != nullptr){
+                text += "\n";
+                text += QString::fromStdString(spot->getVehicle()->getRegistrationNumber());
+            }
+        }
+        else
+            text += "AVAILABLE";
+
+        button->setText(text);
+        break;
+    }
+}
 
 MainWindow::MainWindow(ParkingManager* parkingManager, QWidget* parent) : QMainWindow(parent){
     this->parkingManager = parkingManager;
@@ -22,13 +63,9 @@ MainWindow::MainWindow(ParkingManager* parkingManager, QWidget* parent) : QMainW
     QLabel* title = new QLabel("PARKING LOT SYSTEM");
     title->setAlignment(Qt::AlignCenter);
 
-    int totalSpots = parkingManager->getSpots().size();
-    int availableSpots = parkingManager->getAvailableSpotCount();
-    int occupiedSpots = totalSpots - availableSpots;
-
-    QLabel* totalLabel = new QLabel("Total Spots\n" + QString::number(totalSpots));
-    QLabel* occupiedLabel = new QLabel("Occupied\n" + QString::number(occupiedSpots));
-    QLabel* availableLabel = new QLabel("Available\n" + QString::number(availableSpots));
+    totalLabel = new QLabel();
+    occupiedLabel = new QLabel();
+    availableLabel = new QLabel();
 
     totalLabel->setAlignment(Qt::AlignCenter);
     occupiedLabel->setAlignment(Qt::AlignCenter);
@@ -46,7 +83,7 @@ MainWindow::MainWindow(ParkingManager* parkingManager, QWidget* parent) : QMainW
 
     int row = 0, column = 0;
     for(ParkingSpot* spot : parkingManager->getSpots()){
-        QString spotId = QString::fromStdString(spot->getSpotId());
+        string spotId = spot->getSpotId();
         QString spotType = QString::fromStdString(spot->getSpotType());
         QString status;
 
@@ -58,11 +95,11 @@ MainWindow::MainWindow(ParkingManager* parkingManager, QWidget* parent) : QMainW
         else
             status = "AVAILABLE";
 
-        QString buttonText = spotId + "\n" + spotType + "\n" + status;
+        QString buttonText = QString::fromStdString(spotId) + "\n" + spotType + "\n" + status;
         QPushButton* spotButton = new QPushButton(buttonText);
         spotButton->setMinimumSize(150, 90);
-
         parkingGrid->addWidget(spotButton, row, column);
+        spotButtons[spotId] = spotButton;
         column++;
 
         if(column == 4){
@@ -86,4 +123,14 @@ MainWindow::MainWindow(ParkingManager* parkingManager, QWidget* parent) : QMainW
     mainLayout->addLayout(parkingGrid);
     mainLayout->addStretch();
     mainLayout->addLayout(buttonLayout);
+
+    for(ParkingSpot* spot : parkingManager->getSpots())
+        spot->addObserver(this);
+
+    refreshStatistics();
+}
+
+void MainWindow::update(string spotId, bool occupied){
+    refreshSpot(spotId);
+    refreshStatistics();
 }
