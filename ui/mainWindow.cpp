@@ -102,6 +102,46 @@ void MainWindow::parkVehicle(){
     QMessageBox::information(this, "Vehicle Parked", "Vehicle parked successfully.\n\n" "Ticket ID: " + QString::fromStdString(ticket->getTicketId()) + "\nSpot: " +QString::fromStdString(ticket->getParkingSpot()->getSpotId()));
 }
 
+void MainWindow::exitVehicle(){
+    bool ok;
+    QString ticketId = QInputDialog::getText(this, "Exit Vehicle", "Enter ticket ID:", QLineEdit::Normal, "", &ok);
+
+    if(!ok)
+        return;
+
+    ticketId = ticketId.trimmed().toUpper();
+    if(ticketId.isEmpty()){
+        QMessageBox::warning(this, "Invalid Input", "Ticket ID cannot be empty.");
+        return;
+    }
+
+    string id = ticketId.toStdString();
+    Ticket* ticket = parkingManager->findTicket(id);
+    if(ticket == nullptr){
+        QMessageBox::warning(this, "Invalid Ticket", "Invalid ticket ID.");
+        return;
+    }
+
+    Vehicle* vehicle = ticket->getVehicle();
+    double fee = parkingManager->exitVehicle(id);
+
+    if(fee == -1){
+        QMessageBox::warning(this, "Invalid Ticket", "Invalid ticket ID.");
+        return;
+    }
+
+    for(auto it = vehicles.begin(); it != vehicles.end(); ++it){
+        if(*it == vehicle){
+            delete *it;
+            vehicles.erase(it);
+            break;
+        }
+    }
+
+    QMessageBox::information( this, "Vehicle Exited", "Vehicle exited successfully.\n\n" "Ticket ID: " + ticketId + "\nParking Fee: Rs. " + QString::number(fee, 'f', 2)
+    );
+}
+
 MainWindow::MainWindow(ParkingManager* parkingManager, QWidget* parent) : QMainWindow(parent){
     this->parkingManager = parkingManager;
 
@@ -174,7 +214,9 @@ MainWindow::MainWindow(ParkingManager* parkingManager, QWidget* parent) : QMainW
     QPushButton* parkButton = new QPushButton("Park Vehicle");
     QPushButton* exitButton = new QPushButton("Exit Vehicle");
     QPushButton* searchButton = new QPushButton("Search");
+    
     connect(parkButton, &QPushButton::clicked, this, &MainWindow::parkVehicle);
+    connect(exitButton, &QPushButton::clicked, this, &MainWindow::exitVehicle);
 
     buttonLayout->addWidget(parkButton);
     buttonLayout->addWidget(exitButton);

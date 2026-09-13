@@ -23,6 +23,7 @@ class MainWindow : public QMainWindow, public ParkingObserver{
     void refreshStatistics();
     void refreshSpot(std::string spotId);
     void parkVehicle();
+    void exitVehicle();
 
 public:
     MainWindow(ParkingManager* parkingManager, QWidget* parent = nullptr);
