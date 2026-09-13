@@ -17,7 +17,11 @@ int main(int argc, char *argv[]){
     logger.log("Parking Lot System started");
 
     ParkingLot parkingLot;
-    vector<ParkingSpot*> spots = parkingLot.createParkingSpots();
+    int bikeCount = 5;
+    int compactCount = 5;
+    int largeCount = 5;
+    int electricCount = 5;
+    vector<ParkingSpot*> spots = parkingLot.createParkingSpots(bikeCount, compactCount, largeCount, electricCount);
 
     DisplayBoard displayBoard;
     for(ParkingSpot* spot : spots)

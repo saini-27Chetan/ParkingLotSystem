@@ -4,77 +4,77 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QWidget>
+#include <QGridLayout>
 #include "ParkingManager.h"
 #include "ParkingSpot.h"
 
-MainWindow::MainWindow(ParkingManager* parkingManager,QWidget* parent){
-    this->parkingManager=parkingManager;
+MainWindow::MainWindow(ParkingManager* parkingManager, QWidget* parent) : QMainWindow(parent){
+    this->parkingManager = parkingManager;
 
     setWindowTitle("Parking Lot System");
     resize(1000, 700);
 
-    QWidget *centralWidget = new QWidget(this);
+    QWidget* centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
+    QVBoxLayout* mainLayout = new QVBoxLayout(centralWidget);
 
-    QLabel *title = new QLabel("PARKING LOT SYSTEM");
+    QLabel* title = new QLabel("PARKING LOT SYSTEM");
     title->setAlignment(Qt::AlignCenter);
-
-    QHBoxLayout *statsLayout = new QHBoxLayout();
 
     int totalSpots = parkingManager->getSpots().size();
     int availableSpots = parkingManager->getAvailableSpotCount();
     int occupiedSpots = totalSpots - availableSpots;
 
-    QLabel* totalLabel = new QLabel(
-        "Total Spots\n" + QString::number(totalSpots)
-    );
-
-    QLabel* occupiedLabel = new QLabel(
-        "Occupied\n" + QString::number(occupiedSpots)
-    );
-
-    QLabel* availableLabel = new QLabel(
-        "Available\n" + QString::number(availableSpots)
-    );
+    QLabel* totalLabel = new QLabel("Total Spots\n" + QString::number(totalSpots));
+    QLabel* occupiedLabel = new QLabel("Occupied\n" + QString::number(occupiedSpots));
+    QLabel* availableLabel = new QLabel("Available\n" + QString::number(availableSpots));
 
     totalLabel->setAlignment(Qt::AlignCenter);
     occupiedLabel->setAlignment(Qt::AlignCenter);
     availableLabel->setAlignment(Qt::AlignCenter);
 
+    QHBoxLayout* statsLayout = new QHBoxLayout();
+
     statsLayout->addWidget(totalLabel);
     statsLayout->addWidget(occupiedLabel);
     statsLayout->addWidget(availableLabel);
 
-    QLabel* parkingArea = new QLabel();
-    QString parkingText = "PARKING AREA\n\n";
+    QLabel* parkingAreaTitle = new QLabel("PARKING AREA");
+    parkingAreaTitle->setAlignment(Qt::AlignCenter);
+    QGridLayout* parkingGrid = new QGridLayout();
 
+    int row = 0, column = 0;
     for(ParkingSpot* spot : parkingManager->getSpots()){
-        parkingText += QString::fromStdString(spot->getSpotId());
-        parkingText += " - ";
-        parkingText += QString::fromStdString(spot->getSpotType());
+        QString spotId = QString::fromStdString(spot->getSpotId());
+        QString spotType = QString::fromStdString(spot->getSpotType());
+        QString status;
 
         if(spot->isOccupied()){
-            parkingText += " - OCCUPIED";
-            if(spot->getVehicle() != nullptr){
-                parkingText += " - ";
-                parkingText += QString::fromStdString(spot->getVehicle()->getRegistrationNumber());
-            }
+            status = "OCCUPIED";
+            if(spot->getVehicle() != nullptr)
+                status += "\n" + QString::fromStdString(spot->getVehicle()->getRegistrationNumber());
         }
         else
-            parkingText += " - AVAILABLE";
-        parkingText += "\n";
+            status = "AVAILABLE";
+
+        QString buttonText = spotId + "\n" + spotType + "\n" + status;
+        QPushButton* spotButton = new QPushButton(buttonText);
+        spotButton->setMinimumSize(150, 90);
+
+        parkingGrid->addWidget(spotButton, row, column);
+        column++;
+
+        if(column == 4){
+            column = 0;
+            row++;
+        }
     }
 
-    parkingArea->setText(parkingText);
-    parkingArea->setAlignment(Qt::AlignCenter);
-
-    QHBoxLayout *buttonLayout = new QHBoxLayout();
-
-    QPushButton *parkButton = new QPushButton("Park Vehicle");
-    QPushButton *exitButton = new QPushButton("Exit Vehicle");
-    QPushButton *searchButton = new QPushButton("Search");
+    QHBoxLayout* buttonLayout = new QHBoxLayout();
+    QPushButton* parkButton = new QPushButton("Park Vehicle");
+    QPushButton* exitButton = new QPushButton("Exit Vehicle");
+    QPushButton* searchButton = new QPushButton("Search");
 
     buttonLayout->addWidget(parkButton);
     buttonLayout->addWidget(exitButton);
@@ -82,7 +82,8 @@ MainWindow::MainWindow(ParkingManager* parkingManager,QWidget* parent){
 
     mainLayout->addWidget(title);
     mainLayout->addLayout(statsLayout);
-    mainLayout->addWidget(parkingArea);
+    mainLayout->addWidget(parkingAreaTitle);
+    mainLayout->addLayout(parkingGrid);
     mainLayout->addStretch();
     mainLayout->addLayout(buttonLayout);
 }

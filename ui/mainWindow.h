@@ -8,7 +8,7 @@ class ParkingManager;
 class MainWindow : public QMainWindow{
     ParkingManager* parkingManager;
 public:
-    MainWindow(ParkingManager* parkingManager, QWidget* parent=nullptr);
+    MainWindow(ParkingManager* parkingManager, QWidget* parent = nullptr);
 };
 
 #endif
