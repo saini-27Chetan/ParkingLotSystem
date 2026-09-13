@@ -5,8 +5,11 @@
 #include <QHBoxLayout>
 #include <QWidget>
 #include <QGridLayout>
+#include <QInputDialog>
+#include <QMessageBox>
 #include "ParkingManager.h"
 #include "ParkingSpot.h"
+#include "VehicleFactory.h"
 using namespace std;
 
 void MainWindow::refreshStatistics(){
@@ -39,6 +42,12 @@ void MainWindow::refreshSpot(std::string spotId){
             if(spot->getVehicle() != nullptr){
                 text += "\n";
                 text += QString::fromStdString(spot->getVehicle()->getRegistrationNumber());
+                Ticket* ticket = parkingManager->findVehicle(spot->getVehicle()->getRegistrationNumber());
+
+                if(ticket != nullptr){
+                    text += "\nTicket ID: ";
+                    text += QString::fromStdString(ticket->getTicketId());
+                }
             }
         }
         else
@@ -47,6 +56,50 @@ void MainWindow::refreshSpot(std::string spotId){
         button->setText(text);
         break;
     }
+}
+
+void MainWindow::parkVehicle(){
+    bool ok;
+    QString registrationNumber = QInputDialog::getText(this, "Park Vehicle", "Enter registration number:", QLineEdit::Normal, "", &ok);
+
+    if(!ok)
+        return;
+
+    registrationNumber = registrationNumber.trimmed().toUpper();
+    if(registrationNumber.isEmpty()){
+        QMessageBox::warning(
+            this, "Invalid Input", "Registration number cannot be empty.");
+        return;
+    }
+
+    QStringList vehicleTypes;
+    vehicleTypes << "CAR"
+                 << "BIKE"
+                 << "ELECTRIC";
+
+    QString vehicleType = QInputDialog::getItem(this, "Park Vehicle", "Select vehicle type:", vehicleTypes, 0, false, &ok);
+
+    if(!ok)
+        return;
+
+    string regNumber = registrationNumber.toStdString();
+    string type = vehicleType.toStdString();
+    if(parkingManager->findVehicle(regNumber) != nullptr){
+        QMessageBox::warning(this, "Vehicle Already Parked", "This vehicle is already parked.");
+        return;
+    }
+
+    Vehicle* vehicle = VehicleFactory::createVehicle(regNumber, type);
+    Ticket* ticket = parkingManager->parkVehicle(vehicle);
+    if(ticket == nullptr){
+        delete vehicle;
+        QMessageBox::warning(this, "Parking Unavailable", "No suitable parking spot is available.");
+        return;
+    }
+
+    vehicles.push_back(vehicle);
+    refreshSpot(ticket->getParkingSpot()->getSpotId());
+    QMessageBox::information(this, "Vehicle Parked", "Vehicle parked successfully.\n\n" "Ticket ID: " + QString::fromStdString(ticket->getTicketId()) + "\nSpot: " +QString::fromStdString(ticket->getParkingSpot()->getSpotId()));
 }
 
 MainWindow::MainWindow(ParkingManager* parkingManager, QWidget* parent) : QMainWindow(parent){
@@ -89,8 +142,17 @@ MainWindow::MainWindow(ParkingManager* parkingManager, QWidget* parent) : QMainW
 
         if(spot->isOccupied()){
             status = "OCCUPIED";
-            if(spot->getVehicle() != nullptr)
+            if(spot->getVehicle() != nullptr){
                 status += "\n" + QString::fromStdString(spot->getVehicle()->getRegistrationNumber());
+                Ticket* ticket = parkingManager->findVehicle(spot->getVehicle()->getRegistrationNumber());
+
+                if(ticket != nullptr){
+                    status += "\nTicket ID: ";
+                    status += QString::fromStdString(
+                        ticket->getTicketId()
+                    );
+                }
+            }
         }
         else
             status = "AVAILABLE";
@@ -112,6 +174,7 @@ MainWindow::MainWindow(ParkingManager* parkingManager, QWidget* parent) : QMainW
     QPushButton* parkButton = new QPushButton("Park Vehicle");
     QPushButton* exitButton = new QPushButton("Exit Vehicle");
     QPushButton* searchButton = new QPushButton("Search");
+    connect(parkButton, &QPushButton::clicked, this, &MainWindow::parkVehicle);
 
     buttonLayout->addWidget(parkButton);
     buttonLayout->addWidget(exitButton);
@@ -133,4 +196,9 @@ MainWindow::MainWindow(ParkingManager* parkingManager, QWidget* parent) : QMainW
 void MainWindow::update(string spotId, bool occupied){
     refreshSpot(spotId);
     refreshStatistics();
+}
+
+MainWindow::~MainWindow(){
+    for(Vehicle* vehicle : vehicles)
+        delete vehicle;
 }
