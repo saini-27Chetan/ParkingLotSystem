@@ -59,16 +59,24 @@ void MainWindow::refreshSpot(std::string spotId){
 }
 
 void MainWindow::parkVehicle(){
-    bool ok;
-    QString registrationNumber = QInputDialog::getText(this, "Park Vehicle", "Enter registration number:", QLineEdit::Normal, "", &ok);
+    QInputDialog dialog(this);
+    dialog.setWindowTitle("Park Vehicle");
+    dialog.setLabelText("Enter registration number:");
+    dialog.setInputMode(QInputDialog::TextInput);
+    dialog.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
 
-    if(!ok)
+    if(dialog.exec() != QDialog::Accepted)
         return;
 
+    QString registrationNumber = dialog.textValue();
     registrationNumber = registrationNumber.trimmed().toUpper();
     if(registrationNumber.isEmpty()){
-        QMessageBox::warning(
-            this, "Invalid Input", "Registration number cannot be empty.");
+        QMessageBox messageBox(this);
+        messageBox.setWindowTitle("Invalid Input");
+        messageBox.setText("Registration number cannot be empty.");
+        messageBox.setIcon(QMessageBox::Warning);
+        messageBox.resize(WARNING_WIDTH, WARNING_HEIGHT);
+        messageBox.exec();
         return;
     }
 
@@ -77,15 +85,26 @@ void MainWindow::parkVehicle(){
                  << "BIKE"
                  << "ELECTRIC";
 
-    QString vehicleType = QInputDialog::getItem(this, "Park Vehicle", "Select vehicle type:", vehicleTypes, 0, false, &ok);
+    QInputDialog vehicleTypeDialog(this);
+    vehicleTypeDialog.setWindowTitle("Park Vehicle");
+    vehicleTypeDialog.setLabelText("Select vehicle type:");
+    vehicleTypeDialog.setComboBoxItems(vehicleTypes);
+    vehicleTypeDialog.setComboBoxEditable(false);
+    vehicleTypeDialog.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
 
-    if(!ok)
+    if(vehicleTypeDialog.exec() != QDialog::Accepted)
         return;
 
+    QString vehicleType = vehicleTypeDialog.textValue();
     string regNumber = registrationNumber.toStdString();
     string type = vehicleType.toStdString();
     if(parkingManager->findVehicle(regNumber) != nullptr){
-        QMessageBox::warning(this, "Vehicle Already Parked", "This vehicle is already parked.");
+        QMessageBox messageBox(this);
+        messageBox.setWindowTitle("Vehicle Already Parked");
+        messageBox.setText("This vehicle is already parked.");
+        messageBox.setIcon(QMessageBox::Warning);
+        messageBox.resize(WARNING_WIDTH, WARNING_HEIGHT);
+        messageBox.exec();
         return;
     }
 
@@ -93,40 +112,68 @@ void MainWindow::parkVehicle(){
     Ticket* ticket = parkingManager->parkVehicle(vehicle);
     if(ticket == nullptr){
         delete vehicle;
-        QMessageBox::warning(this, "Parking Unavailable", "No suitable parking spot is available.");
+        QMessageBox messageBox(this);
+        messageBox.setWindowTitle("Parking Unavailable");
+        messageBox.setText("No suitable parking spot is available.");
+        messageBox.setIcon(QMessageBox::Warning);
+        messageBox.resize(WARNING_WIDTH, WARNING_HEIGHT);
+        messageBox.exec();
         return;
     }
 
     vehicles.push_back(vehicle);
     refreshSpot(ticket->getParkingSpot()->getSpotId());
-    QMessageBox::information(this, "Vehicle Parked", "Vehicle parked successfully.\n\n" "Ticket ID: " + QString::fromStdString(ticket->getTicketId()) + "\nSpot: " +QString::fromStdString(ticket->getParkingSpot()->getSpotId()));
+    QMessageBox messageBox(this);
+    messageBox.setWindowTitle("Vehicle Parked");
+    messageBox.setText("Vehicle parked successfully.\n\n" "Ticket ID: " + QString::fromStdString(ticket->getTicketId()) + "\nSpot: " + QString::fromStdString(ticket->getParkingSpot()->getSpotId()) );
+    messageBox.setIcon(QMessageBox::Information);
+    messageBox.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
+    messageBox.exec();
 }
 
 void MainWindow::exitVehicle(){
-    bool ok;
-    QString ticketId = QInputDialog::getText(this, "Exit Vehicle", "Enter ticket ID:", QLineEdit::Normal, "", &ok);
+    QInputDialog dialog(this);
+    dialog.setWindowTitle("Exit Vehicle");
+    dialog.setLabelText("Enter ticket ID:");
+    dialog.setInputMode(QInputDialog::TextInput);
+    dialog.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
 
-    if(!ok)
+    if(dialog.exec() != QDialog::Accepted)
         return;
 
+    QString ticketId = dialog.textValue();
     ticketId = ticketId.trimmed().toUpper();
     if(ticketId.isEmpty()){
-        QMessageBox::warning(this, "Invalid Input", "Ticket ID cannot be empty.");
+        QMessageBox messageBox(this);
+        messageBox.setWindowTitle("Invalid Input");
+        messageBox.setText("Ticket ID cannot be empty.");
+        messageBox.setIcon(QMessageBox::Warning);
+        messageBox.resize(WARNING_WIDTH, WARNING_HEIGHT);
+        messageBox.exec();
         return;
     }
 
     string id = ticketId.toStdString();
     Ticket* ticket = parkingManager->findTicket(id);
     if(ticket == nullptr){
-        QMessageBox::warning(this, "Invalid Ticket", "Invalid ticket ID.");
+        QMessageBox messageBox(this);
+        messageBox.setWindowTitle("Invalid Ticket");
+        messageBox.setText("Invalid ticket ID.");
+        messageBox.setIcon(QMessageBox::Warning);
+        messageBox.resize(WARNING_WIDTH, WARNING_HEIGHT);
+        messageBox.exec();
         return;
     }
 
     Vehicle* vehicle = ticket->getVehicle();
     double fee = parkingManager->exitVehicle(id);
-
     if(fee == -1){
-        QMessageBox::warning(this, "Invalid Ticket", "Invalid ticket ID.");
+        QMessageBox messageBox(this);
+        messageBox.setWindowTitle("Invalid Ticket");
+        messageBox.setText("Invalid ticket ID.");
+        messageBox.setIcon(QMessageBox::Warning);
+        messageBox.resize(WARNING_WIDTH, WARNING_HEIGHT);
+        messageBox.exec();
         return;
     }
 
@@ -138,11 +185,127 @@ void MainWindow::exitVehicle(){
         }
     }
 
-    QMessageBox::information( this, "Vehicle Exited", "Vehicle exited successfully.\n\n" "Ticket ID: " + ticketId + "\nParking Fee: Rs. " + QString::number(fee, 'f', 2)
-    );
+    QMessageBox messageBox(this);
+    messageBox.setWindowTitle("Vehicle Exited");
+    messageBox.setText("Vehicle exited successfully.\n\n" "Ticket ID: " + ticketId + "\nParking Fee: Rs. " + QString::number(fee, 'f', 2) );
+    messageBox.setIcon(QMessageBox::Information);
+    messageBox.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
+    messageBox.exec();
 }
 
-MainWindow::MainWindow(ParkingManager* parkingManager, QWidget* parent) : QMainWindow(parent){
+void MainWindow::searchVehicle(){
+    QInputDialog dialog(this);
+    dialog.setWindowTitle("Search Vehicle");
+    dialog.setLabelText("Enter registration number:");
+    dialog.setInputMode(QInputDialog::TextInput);
+    dialog.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
+
+    if(dialog.exec() != QDialog::Accepted)
+        return;
+
+    QString registrationNumber = dialog.textValue();
+    registrationNumber = registrationNumber.trimmed().toUpper();
+    if(registrationNumber.isEmpty()){
+        QMessageBox messageBox(this);
+        messageBox.setWindowTitle("Invalid Input");
+        messageBox.setText("Registration number cannot be empty.");
+        messageBox.setIcon(QMessageBox::Warning);
+        messageBox.resize(WARNING_WIDTH, WARNING_HEIGHT);
+        messageBox.exec();
+        return;
+    }
+
+    string regNumber = registrationNumber.toStdString();
+    Ticket* ticket = parkingManager->findVehicle(regNumber);
+    if(ticket == nullptr){
+        QMessageBox messageBox(this);
+        messageBox.setWindowTitle("Vehicle Not Found");
+        messageBox.setText("Vehicle not found.");
+        messageBox.setIcon(QMessageBox::Information);
+        messageBox.resize(WARNING_WIDTH, WARNING_HEIGHT);
+        messageBox.exec();
+        return;
+    }
+
+    QString message;
+    message += "Vehicle found\n\n";
+    message += "Registration Number: ";
+    message += QString::fromStdString(ticket->getVehicle()->getRegistrationNumber());
+
+    message += "\nVehicle Type: ";
+    message += QString::fromStdString(ticket->getVehicle()->getVehicleType());
+
+    message += "\nTicket ID: ";
+    message += QString::fromStdString(ticket->getTicketId());
+
+    message += "\nSpot: ";
+    message += QString::fromStdString(ticket->getParkingSpot()->getSpotId());
+
+    QMessageBox messageBox(this);
+    messageBox.setWindowTitle("Vehicle Found");
+    messageBox.setText(message);
+    messageBox.setIcon(QMessageBox::Information);
+    messageBox.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
+    messageBox.exec();
+}
+
+void MainWindow::searchTicket(){
+    QInputDialog dialog(this);
+    dialog.setWindowTitle("Search Vehicle by Ticket Id");
+    dialog.setLabelText("Enter ticket ID:");
+    dialog.setInputMode(QInputDialog::TextInput);
+    dialog.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
+
+    if(dialog.exec() != QDialog::Accepted)
+        return;
+
+    QString ticketId = dialog.textValue();
+    ticketId = ticketId.trimmed().toUpper();
+    if(ticketId.isEmpty()){
+        QMessageBox messageBox(this);
+        messageBox.setWindowTitle("Invalid Input");
+        messageBox.setText("Ticket ID cannot be empty.");
+        messageBox.setIcon(QMessageBox::Warning);
+        messageBox.resize(WARNING_WIDTH, WARNING_HEIGHT);
+        messageBox.exec();
+        return;
+    }
+
+    string id = ticketId.toStdString();
+    Ticket* ticket = parkingManager->findTicket(id);
+    if(ticket == nullptr){
+        QMessageBox messageBox(this);
+        messageBox.setWindowTitle("Ticket Not Found");
+        messageBox.setText("Ticket not found.");
+        messageBox.setIcon(QMessageBox::Information);
+        messageBox.resize(WARNING_WIDTH, WARNING_HEIGHT);
+        messageBox.exec();
+        return;
+    }
+
+    QString message;
+    message += "Ticket found\n\n";
+    message += "Registration Number: ";
+    message += QString::fromStdString(ticket->getVehicle()->getRegistrationNumber());
+
+    message += "\nVehicle Type: ";
+    message += QString::fromStdString(ticket->getVehicle()->getVehicleType());
+
+    message += "\nTicket ID: ";
+    message += QString::fromStdString(ticket->getTicketId());
+
+    message += "\nSpot: ";
+    message += QString::fromStdString(ticket->getParkingSpot()->getSpotId());
+
+    QMessageBox messageBox(this);
+    messageBox.setWindowTitle("Ticket Found");
+    messageBox.setText(message);
+    messageBox.setIcon(QMessageBox::Information);
+    messageBox.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
+    messageBox.exec();
+}
+
+MainWindow::MainWindow(ParkingManager* parkingManager,QWidget* parent) : QMainWindow(parent){
     this->parkingManager = parkingManager;
 
     setWindowTitle("Parking Lot System");
@@ -197,10 +360,10 @@ MainWindow::MainWindow(ParkingManager* parkingManager, QWidget* parent) : QMainW
         else
             status = "AVAILABLE";
 
-        QString buttonText = QString::fromStdString(spotId) + "\n" + spotType + "\n" + status;
+        QString buttonText =QString::fromStdString(spotId) + "\n" + spotType + "\n" + status;
         QPushButton* spotButton = new QPushButton(buttonText);
         spotButton->setMinimumSize(150, 90);
-        parkingGrid->addWidget(spotButton, row, column);
+        parkingGrid->addWidget(spotButton, row, column );
         spotButtons[spotId] = spotButton;
         column++;
 
@@ -214,9 +377,30 @@ MainWindow::MainWindow(ParkingManager* parkingManager, QWidget* parent) : QMainW
     QPushButton* parkButton = new QPushButton("Park Vehicle");
     QPushButton* exitButton = new QPushButton("Exit Vehicle");
     QPushButton* searchButton = new QPushButton("Search");
-    
-    connect(parkButton, &QPushButton::clicked, this, &MainWindow::parkVehicle);
-    connect(exitButton, &QPushButton::clicked, this, &MainWindow::exitVehicle);
+
+    connect(parkButton, &QPushButton::clicked, this, &MainWindow::parkVehicle );
+    connect(exitButton, &QPushButton::clicked, this, &MainWindow::exitVehicle );
+    connect(searchButton, &QPushButton::clicked, this, [this](){
+        QStringList options;
+        options << "Search Vehicle by Registration Number"
+                << "Search Vehicle by Ticket Id";
+
+        QInputDialog dialog(this);
+        dialog.setWindowTitle("Search");
+        dialog.setLabelText("Select search type:");
+        dialog.setInputMode(QInputDialog::TextInput);
+        dialog.setComboBoxItems(options);
+        dialog.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
+
+        if(dialog.exec() != QDialog::Accepted)
+            return;
+
+        QString choice = dialog.textValue();
+        if(choice == "Search Vehicle by Registration Number")
+            searchVehicle();
+        else if(choice == "Search Vehicle by Ticket Id")
+            searchTicket();
+    });
 
     buttonLayout->addWidget(parkButton);
     buttonLayout->addWidget(exitButton);

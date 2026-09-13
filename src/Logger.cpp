@@ -10,5 +10,5 @@ Logger& Logger::getInstance(){
 }
 
 void Logger::log(string message){
-    cout<<"\n[LOG] "<<message<<"\n";
+    cout<<"[LOG] "<<message<<"\n";
 }

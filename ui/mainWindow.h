@@ -22,8 +22,17 @@ class MainWindow : public QMainWindow, public ParkingObserver{
 
     void refreshStatistics();
     void refreshSpot(std::string spotId);
+    
     void parkVehicle();
     void exitVehicle();
+    void searchVehicle();
+    void searchTicket();
+
+    static constexpr int DIALOG_WIDTH = 300;
+    static constexpr int DIALOG_HEIGHT = 200;
+
+    static constexpr int WARNING_WIDTH = 350;
+    static constexpr int WARNING_HEIGHT = 150;
 
 public:
     MainWindow(ParkingManager* parkingManager, QWidget* parent = nullptr);
