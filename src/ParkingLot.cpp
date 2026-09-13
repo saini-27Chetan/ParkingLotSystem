@@ -4,25 +4,29 @@ using namespace std;
 
 vector<ParkingSpot*> ParkingLot::createParkingSpots(int bikeCount, int compactCount, int largeCount, int electricCount){
     vector<ParkingSpot*> spots;
-    for(int i=1;i<=bikeCount;i++){
-        string spotId="B"+to_string(i);
-        spots.push_back(ParkingSpotFactory::createParkingSpot(spotId, "Bike"));
-    }
+    const double SPOT_DISTANCE = 5.0, ROW_DISTANCE = 5.0;
+    const int SPOTS_PER_ROW = 4;
 
-    for(int i=1;i<=compactCount;i++){
-        string spotId="C"+to_string(i);
-        spots.push_back(ParkingSpotFactory::createParkingSpot(spotId, "Compact"));
-    }
+    int currentIndex = 0;
+    auto createSpots = [&](int count, string prefix, string spotType){
+        for(int i = 1; i <= count; i++){
+            string spotId = prefix + to_string(i);
 
-    for(int i=1;i<=largeCount;i++){
-        string spotId="L"+to_string(i);
-        spots.push_back(ParkingSpotFactory::createParkingSpot(spotId, "Large"));
-    }
+            int row = currentIndex / SPOTS_PER_ROW;
+            int column = currentIndex % SPOTS_PER_ROW;
+            double x = column * SPOT_DISTANCE;
+            double y = row * ROW_DISTANCE;
+            Position position(x, y);
 
-    for(int i=1;i<=electricCount;i++){
-        string spotId="E"+to_string(i);
-        spots.push_back(ParkingSpotFactory::createParkingSpot(spotId, "Electric"));
-    }
+            spots.push_back(ParkingSpotFactory::createParkingSpot(spotId, spotType, position));
+            currentIndex++;
+        }
+    };
+
+    createSpots(bikeCount, "B", "Bike");
+    createSpots(compactCount, "C", "Compact");
+    createSpots(largeCount, "L", "Large");
+    createSpots(electricCount, "E", "Electric");
 
     return spots;
 }

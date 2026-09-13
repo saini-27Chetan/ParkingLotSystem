@@ -305,8 +305,48 @@ void MainWindow::searchTicket(){
     messageBox.exec();
 }
 
-MainWindow::MainWindow(ParkingManager* parkingManager,QWidget* parent) : QMainWindow(parent){
+void MainWindow::changeParkingStrategy(){
+    QStringList options;
+    options << "First Available Spot"
+            << "Nearest Available Spot";
+
+    QInputDialog dialog(this);
+    dialog.setWindowTitle("Change Parking Strategy");
+    dialog.setLabelText("Select parking strategy:");
+    dialog.setInputMode(QInputDialog::TextInput);
+    dialog.setComboBoxItems(options);
+    dialog.setComboBoxEditable(false);
+    dialog.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
+
+    if(dialog.exec() != QDialog::Accepted)
+        return;
+
+    QString choice = dialog.textValue();
+    if(choice == "First Available Spot"){
+        parkingManager->setParkingStrategy(firstAvailableStrategy);
+        QMessageBox messageBox(this);
+        messageBox.setWindowTitle("Parking Strategy Changed");
+        messageBox.setText("Parking strategy changed to First Available Spot.");
+        messageBox.setIcon(QMessageBox::Information);
+        messageBox.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
+        messageBox.exec();
+    }
+
+    else if(choice == "Nearest Available Spot"){
+        parkingManager->setParkingStrategy(nearestStrategy);
+        QMessageBox messageBox(this);
+        messageBox.setWindowTitle("Parking Strategy Changed");
+        messageBox.setText("Parking strategy changed to Nearest Available Spot.");
+        messageBox.setIcon(QMessageBox::Information);
+        messageBox.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
+        messageBox.exec();
+    }
+}
+
+MainWindow::MainWindow(ParkingManager* parkingManager, ParkingSpotStrategy* firstAvailableStrategy, ParkingSpotStrategy* nearestStrategy, QWidget* parent) : QMainWindow(parent){
     this->parkingManager = parkingManager;
+    this->firstAvailableStrategy = firstAvailableStrategy;
+    this->nearestStrategy = nearestStrategy;
 
     setWindowTitle("Parking Lot System");
     resize(1000, 700);
@@ -377,9 +417,11 @@ MainWindow::MainWindow(ParkingManager* parkingManager,QWidget* parent) : QMainWi
     QPushButton* parkButton = new QPushButton("Park Vehicle");
     QPushButton* exitButton = new QPushButton("Exit Vehicle");
     QPushButton* searchButton = new QPushButton("Search");
+    QPushButton* strategyButton = new QPushButton("Change Parking Strategy");
 
     connect(parkButton, &QPushButton::clicked, this, &MainWindow::parkVehicle );
     connect(exitButton, &QPushButton::clicked, this, &MainWindow::exitVehicle );
+    connect(strategyButton, &QPushButton::clicked, this, &MainWindow::changeParkingStrategy);
     connect(searchButton, &QPushButton::clicked, this, [this](){
         QStringList options;
         options << "Search Vehicle by Registration Number"
@@ -405,6 +447,7 @@ MainWindow::MainWindow(ParkingManager* parkingManager,QWidget* parent) : QMainWi
     buttonLayout->addWidget(parkButton);
     buttonLayout->addWidget(exitButton);
     buttonLayout->addWidget(searchButton);
+    buttonLayout->addWidget(strategyButton);
 
     mainLayout->addWidget(title);
     mainLayout->addLayout(statsLayout);

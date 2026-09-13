@@ -2,11 +2,12 @@
 #include"ParkingSpot.h"
 using namespace std;
 
-ParkingSpot::ParkingSpot(string spotId, string spotType){
+ParkingSpot::ParkingSpot(string spotId, string spotType, Position position){
     this->spotId=spotId;
     this->spotType=spotType;
     occupied=false;
     vehicle=nullptr;
+    this->position=position;
 }
 
 string ParkingSpot::getSpotId(){
@@ -27,9 +28,7 @@ bool ParkingSpot::parkVehicle(Vehicle* vehicle){
 
     this->vehicle=vehicle;
     occupied=true;
-
-    for(ParkingObserver* observer:observers)
-        observer->update(spotId,occupied);
+    notifyObservers();
 
     return true;
 }
@@ -37,9 +36,7 @@ bool ParkingSpot::parkVehicle(Vehicle* vehicle){
 void ParkingSpot::removeVehicle(){
     vehicle=nullptr;
     occupied=false;
-
-    for(ParkingObserver* observer:observers)
-        observer->update(spotId,occupied);
+    notifyObservers();
 }
 
 Vehicle* ParkingSpot::getVehicle(){
@@ -48,4 +45,13 @@ Vehicle* ParkingSpot::getVehicle(){
 
 void ParkingSpot::addObserver(ParkingObserver* observer){
     observers.push_back(observer);
+}
+
+void ParkingSpot::notifyObservers(){
+    for(ParkingObserver* observer : observers)
+        observer->update(spotId, occupied);
+}
+
+Position ParkingSpot::getPosition(){
+    return position;
 }

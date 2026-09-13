@@ -17,10 +17,10 @@ int main(int argc, char *argv[]){
     logger.log("Parking Lot System started");
 
     ParkingLot parkingLot;
-    int bikeCount = 1;
-    int compactCount = 1;
-    int largeCount = 1;
-    int electricCount = 1;
+    int bikeCount = 4;
+    int compactCount = 8;
+    int largeCount = 4;
+    int electricCount = 4;
     vector<ParkingSpot*> spots = parkingLot.createParkingSpots(bikeCount, compactCount, largeCount, electricCount);
 
     DisplayBoard displayBoard;
@@ -33,13 +33,9 @@ int main(int argc, char *argv[]){
     HourlyPrice pricingStrategy;
     FlatRatePrice flatRatePrice;
 
-    ParkingManager parkingManager(
-        spots,
-        &parkingStrategy,
-        &pricingStrategy
-    );
+    ParkingManager parkingManager(spots, &parkingStrategy, &pricingStrategy);
 
-    MainWindow window(&parkingManager);
+    MainWindow window(&parkingManager, &parkingStrategy, &nearestSpot);
     window.show();
 
     int result = app.exec();

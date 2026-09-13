@@ -7,7 +7,7 @@ using namespace std;
 
 class ParkingSpotFactory{
 public:
-    static ParkingSpot* createParkingSpot(string spotId,string spotType);
+    static ParkingSpot* createParkingSpot(string spotId,string spotType, Position position);
 };
 
 #endif
