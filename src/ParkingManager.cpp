@@ -59,6 +59,10 @@ Ticket* ParkingManager::findVehicle(string registrationNumber){
     return ticketManager->findVehicle(registrationNumber);
 }
 
+vector<ParkingSpot*>& ParkingManager::getSpots(){
+    return spots;
+}
+
 int ParkingManager::getAvailableSpotCount(){
     int count=0;
     for(ParkingSpot* spot:spots){

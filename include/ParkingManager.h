@@ -25,6 +25,7 @@ public:
     double exitVehicle(string ticketId);
     void setParkingStrategy(ParkingSpotStrategy* parkingStrategy);
     void setPricingStrategy(PricingStrategy* pricingStrategy);
+    vector<ParkingSpot*>& getSpots();
     
     Ticket* parkVehicle(Vehicle* vehicle);
     Ticket* findTicket(string ticketId);
