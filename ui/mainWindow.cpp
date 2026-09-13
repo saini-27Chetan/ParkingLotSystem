@@ -7,6 +7,9 @@
 #include <QGridLayout>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QGroupBox>
+#include <QScrollArea>
+
 #include "ParkingManager.h"
 #include "ParkingSpot.h"
 #include "VehicleFactory.h"
@@ -22,7 +25,7 @@ void MainWindow::refreshStatistics(){
     availableLabel->setText("Available\n" + QString::number(availableSpots));
 }
 
-void MainWindow::refreshSpot(std::string spotId){
+void MainWindow::refreshSpot(string spotId){
     auto buttonIterator = spotButtons.find(spotId);
     if(buttonIterator == spotButtons.end())
         return;
@@ -41,17 +44,40 @@ void MainWindow::refreshSpot(std::string spotId){
             text += "OCCUPIED";
             if(spot->getVehicle() != nullptr){
                 text += "\n";
+                text += "Registration Number: ";
                 text += QString::fromStdString(spot->getVehicle()->getRegistrationNumber());
+                
                 Ticket* ticket = parkingManager->findVehicle(spot->getVehicle()->getRegistrationNumber());
-
                 if(ticket != nullptr){
                     text += "\nTicket ID: ";
                     text += QString::fromStdString(ticket->getTicketId());
+                    text += "\nPricing: ";
+                    if(ticket->getPricingStrategy() == hourlyPricingStrategy)
+                        text += "Hourly";
+                    else if(ticket->getPricingStrategy() == flatRatePricingStrategy)
+                        text += "Flat Rate";
                 }
             }
+            button->setStyleSheet(
+                "QPushButton {"
+                    "background-color: #4a2424;"
+                    "border: 2px solid #f44336;"
+                    "border-radius: 8px;"
+                    "color: #ffb3b3;"
+                "}"
+            );
         }
-        else
+        else{
             text += "AVAILABLE";
+            button->setStyleSheet(
+                "QPushButton {"
+                    "background-color: #244a2a;"
+                    "border: 2px solid #4caf50;"
+                    "border-radius: 8px;"
+                    "color: #b8f5c0;"
+                "}" 
+            );
+        }
 
         button->setText(text);
         break;
@@ -142,11 +168,17 @@ void MainWindow::parkVehicle(){
         return;
     }
 
+    QString pricingText;
+    if(ticket->getPricingStrategy() == hourlyPricingStrategy)
+        pricingText = "Hourly";
+    else if(ticket->getPricingStrategy() == flatRatePricingStrategy)
+        pricingText = "Flat Rate";
+
     vehicles.push_back(vehicle);
     refreshSpot(ticket->getParkingSpot()->getSpotId());
     QMessageBox messageBox(this);
     messageBox.setWindowTitle("Vehicle Parked");
-    messageBox.setText("Vehicle parked successfully.\n\n" "Ticket ID: " + QString::fromStdString(ticket->getTicketId()) + "\nSpot: " + QString::fromStdString(ticket->getParkingSpot()->getSpotId()) );
+    messageBox.setText("Vehicle parked successfully.\n\n" "Ticket ID: " + QString::fromStdString(ticket->getTicketId()) + "\nPricing Strategy: " + pricingText + "\nSpot: " + QString::fromStdString(ticket->getParkingSpot()->getSpotId()) );
     messageBox.setIcon(QMessageBox::Information);
     messageBox.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
     messageBox.exec();
@@ -259,6 +291,12 @@ void MainWindow::searchVehicle(){
     message += "\nTicket ID: ";
     message += QString::fromStdString(ticket->getTicketId());
 
+    message += "\nPricing Strategy: ";
+    if(ticket->getPricingStrategy() == hourlyPricingStrategy)
+        message += "Hourly";
+    else if(ticket->getPricingStrategy() == flatRatePricingStrategy)
+        message += "Flat Rate";
+
     message += "\nSpot: ";
     message += QString::fromStdString(ticket->getParkingSpot()->getSpotId());
 
@@ -314,6 +352,12 @@ void MainWindow::searchTicket(){
 
     message += "\nTicket ID: ";
     message += QString::fromStdString(ticket->getTicketId());
+
+    message += "\nPricing Strategy: ";
+    if(ticket->getPricingStrategy() == hourlyPricingStrategy)
+        message += "Hourly";
+    else if(ticket->getPricingStrategy() == flatRatePricingStrategy)
+        message += "Flat Rate";
 
     message += "\nSpot: ";
     message += QString::fromStdString(ticket->getParkingSpot()->getSpotId());
@@ -378,9 +422,15 @@ MainWindow::MainWindow(ParkingManager* parkingManager, ParkingSpotStrategy* firs
     setCentralWidget(centralWidget);
 
     QVBoxLayout* mainLayout = new QVBoxLayout(centralWidget);
+    mainLayout->setContentsMargins(10, 10, 10, 10);
+    mainLayout->setSpacing(8);
 
     QLabel* title = new QLabel("PARKING LOT SYSTEM");
     title->setAlignment(Qt::AlignCenter);
+    QFont titleFont;
+    titleFont.setPointSize(18);
+    titleFont.setBold(true);
+    title->setFont(titleFont);
 
     totalLabel = new QLabel();
     occupiedLabel = new QLabel();
@@ -390,6 +440,13 @@ MainWindow::MainWindow(ParkingManager* parkingManager, ParkingSpotStrategy* firs
     occupiedLabel->setAlignment(Qt::AlignCenter);
     availableLabel->setAlignment(Qt::AlignCenter);
 
+    QFont statsFont;
+    statsFont.setPointSize(13);
+    statsFont.setBold(true);
+    totalLabel->setFont(statsFont);
+    occupiedLabel->setFont(statsFont);
+    availableLabel->setFont(statsFont);
+
     QHBoxLayout* statsLayout = new QHBoxLayout();
 
     statsLayout->addWidget(totalLabel);
@@ -398,49 +455,97 @@ MainWindow::MainWindow(ParkingManager* parkingManager, ParkingSpotStrategy* firs
 
     QLabel* parkingAreaTitle = new QLabel("PARKING AREA");
     parkingAreaTitle->setAlignment(Qt::AlignCenter);
-    QGridLayout* parkingGrid = new QGridLayout();
+    QFont parkingAreaFont;
+    parkingAreaFont.setPointSize(14);
+    parkingAreaFont.setBold(true);
+    parkingAreaTitle->setFont(parkingAreaFont);
+    
+    QWidget* parkingWidget = new QWidget();
+    parkingWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    QGridLayout* parkingGrid = new QGridLayout(parkingWidget);
+    parkingGrid->setContentsMargins(15, 15, 15, 15);
+    parkingGrid->setHorizontalSpacing(8);
+    parkingGrid->setVerticalSpacing(8);
 
     int row = 0, column = 0;
     for(ParkingSpot* spot : parkingManager->getSpots()){
         string spotId = spot->getSpotId();
         QString spotType = QString::fromStdString(spot->getSpotType());
-        QString status;
-
-        if(spot->isOccupied()){
-            status = "OCCUPIED";
-            if(spot->getVehicle() != nullptr){
-                status += "\n" + QString::fromStdString(spot->getVehicle()->getRegistrationNumber());
-                Ticket* ticket = parkingManager->findVehicle(spot->getVehicle()->getRegistrationNumber());
-
-                if(ticket != nullptr){
-                    status += "\nTicket ID: ";
-                    status += QString::fromStdString(
-                        ticket->getTicketId()
-                    );
-                }
-            }
-        }
-        else
-            status = "AVAILABLE";
-
-        QString buttonText =QString::fromStdString(spotId) + "\n" + spotType + "\n" + status;
+        QString buttonText = QString::fromStdString(spotId) + "\n" + spotType;
         QPushButton* spotButton = new QPushButton(buttonText);
-        spotButton->setMinimumSize(150, 90);
-        parkingGrid->addWidget(spotButton, row, column );
-        spotButtons[spotId] = spotButton;
-        column++;
 
+        spotButton->setMinimumHeight(110);
+        spotButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed );
+        parkingGrid->addWidget(spotButton, row, column);
+        spotButtons[spotId] = spotButton;
+
+        column++;
         if(column == 4){
             column = 0;
             row++;
         }
     }
 
+    for(ParkingSpot* spot : parkingManager->getSpots())
+        refreshSpot(spot->getSpotId());
+
+    QScrollArea* scrollArea = new QScrollArea();
+    scrollArea->setWidget(parkingWidget);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setFrameShape(QFrame::NoFrame);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     QPushButton* parkButton = new QPushButton("Park Vehicle");
     QPushButton* exitButton = new QPushButton("Exit Vehicle");
     QPushButton* searchButton = new QPushButton("Search");
     QPushButton* strategyButton = new QPushButton("Change Parking Strategy");
+
+    QFont buttonFont;
+    buttonFont.setPointSize(11);
+    buttonFont.setBold(true);
+
+    parkButton->setFont(buttonFont);
+    exitButton->setFont(buttonFont);
+    searchButton->setFont(buttonFont);
+    strategyButton->setFont(buttonFont);
+
+    // parkButton->setMinimumHeight(42);
+    // exitButton->setMinimumHeight(42);
+    // searchButton->setMinimumHeight(42);
+    // strategyButton->setMinimumHeight(42);
+
+    parkButton->setFixedHeight(42);
+    exitButton->setFixedHeight(42);
+    searchButton->setFixedHeight(42);
+    strategyButton->setFixedHeight(42);
+
+    QString buttonStyle =
+        "QPushButton {"
+            "background-color: #303030;"
+            "color: white;"
+            "border: 1px solid #555555;"
+            "border-radius: 7px;"
+            "padding: 8px 15px;"
+            "}"
+            "QPushButton:hover {"
+            "background-color: #3d3d3d;"
+            "border: 1px solid #777777;"
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #252525;"
+            "}"
+            "QPushButton:disabled {"
+            "background-color: #202020;"
+            "color: #777777;"
+        "}";
+
+    parkButton->setStyleSheet(buttonStyle);
+    exitButton->setStyleSheet(buttonStyle);
+    searchButton->setStyleSheet(buttonStyle);
+    strategyButton->setStyleSheet(buttonStyle);
 
     connect(parkButton, &QPushButton::clicked, this, &MainWindow::parkVehicle );
     connect(exitButton, &QPushButton::clicked, this, &MainWindow::exitVehicle );
@@ -474,10 +579,24 @@ MainWindow::MainWindow(ParkingManager* parkingManager, ParkingSpotStrategy* firs
 
     mainLayout->addWidget(title);
     mainLayout->addLayout(statsLayout);
+
+    QGroupBox* parkingAreaBox = new QGroupBox();
+    parkingAreaBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QVBoxLayout* parkingAreaLayout = new QVBoxLayout(parkingAreaBox);
+    parkingAreaLayout->setContentsMargins(10, 10, 10, 10);
+    parkingAreaLayout->addWidget(scrollArea);
+
     mainLayout->addWidget(parkingAreaTitle);
-    mainLayout->addLayout(parkingGrid);
-    mainLayout->addStretch();
+    mainLayout->addWidget(parkingAreaBox);
     mainLayout->addLayout(buttonLayout);
+
+    parkingAreaBox->setStyleSheet(
+        "QGroupBox {"
+            "border: 1px solid #444444;"
+            "border-radius: 10px;"
+            "background-color: #202020;"
+        "}"
+    );
 
     for(ParkingSpot* spot : parkingManager->getSpots())
         spot->addObserver(this);
