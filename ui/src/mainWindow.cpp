@@ -291,6 +291,7 @@ void MainWindow::changeParkingStrategy(){
     QString choice = dialog.textValue();
     if(choice == "First Available Spot"){
         parkingManager->setParkingStrategy(firstAvailableStrategy);
+        parkingStrategyLabel->setText("Parking Strategy: First Available Spot");
         QMessageBox messageBox(this);
         messageBox.setWindowTitle("Parking Strategy Changed");
         messageBox.setText("Parking strategy changed to First Available Spot.");
@@ -301,6 +302,7 @@ void MainWindow::changeParkingStrategy(){
 
     else if(choice == "Nearest Available Spot"){
         parkingManager->setParkingStrategy(nearestStrategy);
+        parkingStrategyLabel->setText("Parking Strategy: Nearest Available Spot");
         QMessageBox messageBox(this);
         messageBox.setWindowTitle("Parking Strategy Changed");
         messageBox.setText("Parking strategy changed to Nearest Available Spot.");
@@ -362,6 +364,13 @@ MainWindow::MainWindow(ParkingManager* parkingManager, ParkingSpotStrategy* firs
     parkingAreaFont.setPointSize(14);
     parkingAreaFont.setBold(true);
     parkingAreaTitle->setFont(parkingAreaFont);
+
+    parkingStrategyLabel = new QLabel("Parking Strategy: First Available Spot");
+    parkingStrategyLabel->setAlignment(Qt::AlignCenter);
+    QFont strategyFont;
+    strategyFont.setPointSize(11);
+    strategyFont.setBold(true);
+    parkingStrategyLabel->setFont(strategyFont);
     
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     QPushButton* parkButton = new QPushButton("Park Vehicle");
@@ -377,11 +386,6 @@ MainWindow::MainWindow(ParkingManager* parkingManager, ParkingSpotStrategy* firs
     exitButton->setFont(buttonFont);
     searchButton->setFont(buttonFont);
     strategyButton->setFont(buttonFont);
-
-    // parkButton->setMinimumHeight(42);
-    // exitButton->setMinimumHeight(42);
-    // searchButton->setMinimumHeight(42);
-    // strategyButton->setMinimumHeight(42);
 
     parkButton->setFixedHeight(42);
     exitButton->setFixedHeight(42);
@@ -450,6 +454,7 @@ MainWindow::MainWindow(ParkingManager* parkingManager, ParkingSpotStrategy* firs
     parkingAreaBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QVBoxLayout* parkingAreaLayout = new QVBoxLayout(parkingAreaBox);
     parkingAreaLayout->setContentsMargins(10, 10, 10, 10);
+    parkingAreaLayout->addWidget(parkingStrategyLabel);
     parkingAreaLayout->addWidget(parkingGrid);
 
     mainLayout->addWidget(parkingAreaTitle);

@@ -27,6 +27,7 @@ class MainWindow : public QMainWindow, public ParkingObserver{
     QLabel* totalLabel;
     QLabel* occupiedLabel;
     QLabel* availableLabel;
+    QLabel* parkingStrategyLabel;
 
     void refreshStatistics();
     void parkVehicle();
