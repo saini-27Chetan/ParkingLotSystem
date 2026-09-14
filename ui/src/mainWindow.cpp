@@ -69,7 +69,7 @@ void MainWindow::parkVehicle(){
         delete vehicle;
         QMessageBox messageBox(this);
         messageBox.setWindowTitle("Parking Unavailable");
-        messageBox.setText("No suitable parking spot is available.");
+        messageBox.setText("No suitable parking spot is currently available for this vehicle.");
         messageBox.setIcon(QMessageBox::Warning);
         messageBox.resize(WARNING_WIDTH, WARNING_HEIGHT);
         messageBox.exec();

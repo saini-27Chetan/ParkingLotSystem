@@ -3,9 +3,9 @@
 #include <QFormLayout>
 #include <QLineEdit>
 #include <QVBoxLayout>
+#include <QMessageBox>
 
 #include "dialogs/ParkDialog.h"
-
 using namespace std;
 
 ParkDialog::ParkDialog(QWidget* parent) : QDialog(parent){
@@ -31,7 +31,21 @@ ParkDialog::ParkDialog(QWidget* parent) : QDialog(parent){
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
 
-    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept );
+    connect(buttonBox, &QDialogButtonBox::accepted, this, [this](){
+            string registrationNumber = registrationInput->text().trimmed().toUpper().toStdString();
+
+            if(!isValidRegistrationNumber(registrationNumber)){
+                QMessageBox messageBox(this);
+                messageBox.setWindowTitle("Invalid Registration Number");
+                messageBox.setText("Registration number must follow the format:\n" "XX00XX0000");
+                messageBox.setIcon(QMessageBox::Warning);
+                messageBox.resize(350, 150);
+                messageBox.exec();
+                return;
+            }
+            QDialog::accept();
+        }
+    );
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject );
 
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -49,4 +63,31 @@ string ParkDialog::getVehicleType() const{
 
 string ParkDialog::getPricingType() const{
     return pricingInput->currentText().toStdString();
+}
+
+bool ParkDialog::isValidRegistrationNumber(const string& registrationNumber){
+    if(registrationNumber.length() != 10)
+        return false;
+
+    for(int i = 0; i < 2; i++){
+        if(registrationNumber[i] < 'A' || registrationNumber[i] > 'Z')
+            return false;
+    }
+
+    for(int i = 2; i < 4; i++){
+        if(registrationNumber[i] < '0' || registrationNumber[i] > '9')
+            return false;
+    }
+
+    for(int i = 4; i < 6; i++){
+        if(registrationNumber[i] < 'A' || registrationNumber[i] > 'Z')
+            return false;
+    }
+
+    for(int i = 6; i < 10; i++){
+        if(registrationNumber[i] < '0' || registrationNumber[i] > '9')
+            return false;
+    }
+
+    return true;
 }

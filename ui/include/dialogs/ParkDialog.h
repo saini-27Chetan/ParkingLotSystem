@@ -17,6 +17,8 @@ class ParkDialog : public QDialog{
     QComboBox* vehicleTypeInput;
     QComboBox* pricingInput;
 
+    bool isValidRegistrationNumber(const string& registrationNumber);
+
 public:
     explicit ParkDialog(QWidget* parent = nullptr);
 
