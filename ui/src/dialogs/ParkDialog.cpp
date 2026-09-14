@@ -4,6 +4,8 @@
 #include <QLineEdit>
 #include <QVBoxLayout>
 #include <QMessageBox>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 
 #include "dialogs/ParkDialog.h"
 using namespace std;
@@ -14,6 +16,11 @@ ParkDialog::ParkDialog(QWidget* parent) : QDialog(parent){
 
     registrationInput = new QLineEdit(this);
     registrationInput->setPlaceholderText("Enter registration number");
+    registrationInput->setMaxLength(10);
+
+    QRegularExpression regularExpression("[A-Za-z0-9]*");
+    QRegularExpressionValidator* validator = new QRegularExpressionValidator(regularExpression, this);
+    registrationInput->setValidator(validator);
 
     vehicleTypeInput = new QComboBox(this);
     vehicleTypeInput->addItem("CAR");
