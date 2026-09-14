@@ -53,7 +53,6 @@ ParkingGrid::ParkingGrid(ParkingManager* parkingManager, PricingStrategy* hourly
         refreshSpot(spot->getSpotId());
 }
 
-
 void ParkingGrid::refreshSpot(const string& spotId){
     auto buttonIterator = spotButtons.find(spotId);
     if(buttonIterator == spotButtons.end())

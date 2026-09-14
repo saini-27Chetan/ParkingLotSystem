@@ -32,13 +32,13 @@ add_executable(ParkingLotSystem
 
     src/observer/DisplayBoard.cpp
 
-    ui/src/mainWindow.cpp
+    ui/src/MainWindow.cpp
     ui/src/ParkingGrid.cpp
     ui/src/dialogs/ParkDialog.cpp
     ui/src/dialogs/ExitDialog.cpp
     ui/src/dialogs/SearchDialog.cpp
     
-    ui/include/mainWindow.h
+    ui/include/MainWindow.h
     ui/include/ParkingGrid.h
     ui/include/dialogs/ParkDialog.h
     ui/include/dialogs/ExitDialog.h
