@@ -36,11 +36,13 @@ add_executable(ParkingLotSystem
     ui/src/ParkingGrid.cpp
     ui/src/dialogs/ParkDialog.cpp
     ui/src/dialogs/ExitDialog.cpp
+    ui/src/dialogs/SearchDialog.cpp
     
     ui/include/mainWindow.h
     ui/include/ParkingGrid.h
     ui/include/dialogs/ParkDialog.h
     ui/include/dialogs/ExitDialog.h
+    ui/include/dialogs/SearchDialog.h
 )
 
 target_include_directories(ParkingLotSystem PRIVATE

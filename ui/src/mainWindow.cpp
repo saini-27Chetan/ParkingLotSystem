@@ -13,6 +13,7 @@
 #include "VehicleFactory.h"
 #include "dialogs/ParkDialog.h"
 #include "dialogs/ExitDialog.h"
+#include "dialogs/SearchDialog.h"
 using namespace std;
 
 void MainWindow::refreshStatistics(){
@@ -159,18 +160,13 @@ void MainWindow::exitVehicle(){
 }
 
 void MainWindow::searchVehicle(){
-    QInputDialog dialog(this);
-    dialog.setWindowTitle("Search Vehicle");
-    dialog.setLabelText("Enter registration number:");
-    dialog.setInputMode(QInputDialog::TextInput);
-    dialog.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
+    SearchDialog dialog("Search Vehicle by Registration NUmber", "Registration Number:", this);
 
     if(dialog.exec() != QDialog::Accepted)
         return;
 
-    QString registrationNumber = dialog.textValue();
-    registrationNumber = registrationNumber.trimmed().toUpper();
-    if(registrationNumber.isEmpty()){
+    string regNumber = dialog.getSearchValue();
+    if(regNumber.empty()){
         QMessageBox messageBox(this);
         messageBox.setWindowTitle("Invalid Input");
         messageBox.setText("Registration number cannot be empty.");
@@ -180,7 +176,6 @@ void MainWindow::searchVehicle(){
         return;
     }
 
-    string regNumber = registrationNumber.toStdString();
     Ticket* ticket = parkingManager->findVehicle(regNumber);
     if(ticket == nullptr){
         QMessageBox messageBox(this);
@@ -221,18 +216,14 @@ void MainWindow::searchVehicle(){
 }
 
 void MainWindow::searchTicket(){
-    QInputDialog dialog(this);
-    dialog.setWindowTitle("Search Vehicle by Ticket Id");
-    dialog.setLabelText("Enter ticket ID:");
-    dialog.setInputMode(QInputDialog::TextInput);
-    dialog.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
+    SearchDialog dialog( "Search Vehicle by Ticket Id", "Ticket ID:", this);
 
     if(dialog.exec() != QDialog::Accepted)
         return;
 
-    QString ticketId = dialog.textValue();
-    ticketId = ticketId.trimmed().toUpper();
-    if(ticketId.isEmpty()){
+    string id = dialog.getSearchValue();
+
+    if(id.empty()){
         QMessageBox messageBox(this);
         messageBox.setWindowTitle("Invalid Input");
         messageBox.setText("Ticket ID cannot be empty.");
@@ -242,7 +233,6 @@ void MainWindow::searchTicket(){
         return;
     }
 
-    string id = ticketId.toStdString();
     Ticket* ticket = parkingManager->findTicket(id);
     if(ticket == nullptr){
         QMessageBox messageBox(this);
