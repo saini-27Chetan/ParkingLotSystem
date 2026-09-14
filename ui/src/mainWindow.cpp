@@ -119,6 +119,17 @@ void MainWindow::exitVehicle(){
         return;
     }
 
+    QMessageBox confirmationBox(this);
+    confirmationBox.setWindowTitle("Confirm Exit");
+    confirmationBox.setText("Are you sure you want to exit this vehicle?");
+    confirmationBox.setIcon(QMessageBox::Question);
+    confirmationBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    confirmationBox.setDefaultButton(QMessageBox::No);
+    confirmationBox.resize(DIALOG_WIDTH, DIALOG_HEIGHT);
+
+    if(confirmationBox.exec() != QMessageBox::Yes)
+        return;
+
     Vehicle* vehicle = ticket->getVehicle();
     double fee = parkingManager->exitVehicle(id);
     if(fee == -1){

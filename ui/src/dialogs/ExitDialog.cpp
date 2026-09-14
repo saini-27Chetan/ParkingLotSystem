@@ -8,7 +8,7 @@ using namespace std;
 
 ExitDialog::ExitDialog(QWidget* parent) : QDialog(parent){
     setWindowTitle("Exit Vehicle");
-    resize(200, 100);
+    resize(250, 120);
 
     ticketInput = new QLineEdit(this);
     ticketInput->setPlaceholderText("Enter ticket ID");
