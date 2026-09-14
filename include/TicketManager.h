@@ -13,7 +13,7 @@ public:
     TicketManager();
     ~TicketManager();
 
-    Ticket* createTicket(Vehicle* vehicle,ParkingSpot* parkingSpot);
+    Ticket* createTicket(Vehicle* vehicle,ParkingSpot* parkingSpot, PricingStrategy* pricingStrategy);
     Ticket* findTicket(string ticketId);
     Ticket* findVehicle(string registrationNumber);
     void removeTicket(string ticketId);

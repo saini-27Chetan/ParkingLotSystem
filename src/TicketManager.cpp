@@ -11,11 +11,11 @@ TicketManager::~TicketManager(){
         delete ticket;
 }
 
-Ticket* TicketManager::createTicket(Vehicle* vehicle, ParkingSpot* parkingSpot){
+Ticket* TicketManager::createTicket(Vehicle* vehicle, ParkingSpot* parkingSpot, PricingStrategy* pricingStrategy){
     ticketCounter++;
     string ticketId="T"+to_string(ticketCounter);
 
-    Ticket* ticket=new Ticket(ticketId,vehicle,parkingSpot);
+    Ticket* ticket=new Ticket(ticketId,vehicle,parkingSpot,pricingStrategy);
     activeTickets.push_back(ticket);
 
     return ticket;

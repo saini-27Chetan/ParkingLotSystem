@@ -14,19 +14,19 @@ using namespace std;
 class ParkingManager{
     vector<ParkingSpot*> spots;
     ParkingSpotStrategy* parkingStrategy;
-    PricingStrategy* pricingStrategy;
     TicketManager* ticketManager;
 
 public:
-    ParkingManager(vector<ParkingSpot*>& spots, ParkingSpotStrategy* parkingStrategy, PricingStrategy* pricingStrategy);
+    ParkingManager(vector<ParkingSpot*>& spots, ParkingSpotStrategy* parkingStrategy);
     ~ParkingManager();
-    
+
     int getAvailableSpotCount();
     double exitVehicle(string ticketId);
     void setParkingStrategy(ParkingSpotStrategy* parkingStrategy);
-    void setPricingStrategy(PricingStrategy* pricingStrategy);
+
+    vector<ParkingSpot*>& getSpots();
     
-    Ticket* parkVehicle(Vehicle* vehicle);
+    Ticket* parkVehicle(Vehicle* vehicle, PricingStrategy* pricingStrategy);
     Ticket* findTicket(string ticketId);
     Ticket* findVehicle(string registrationNumber);
 };

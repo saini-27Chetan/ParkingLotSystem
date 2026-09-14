@@ -7,7 +7,12 @@ using namespace std;
 
 class ParkingLot{
 public:
-    vector<ParkingSpot*> createParkingSpots();
+    vector<ParkingSpot*> createParkingSpots(
+        int bikeCount,
+        int compactCount,
+        int largeCount,
+        int electricCount
+    );
 };
 
 #endif
