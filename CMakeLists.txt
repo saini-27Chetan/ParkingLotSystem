@@ -32,13 +32,20 @@ add_executable(ParkingLotSystem
 
     src/observer/DisplayBoard.cpp
 
-    ui/MainWindow.cpp
-    ui/MainWindow.h
+    ui/src/mainWindow.cpp
+    ui/src/ParkingGrid.cpp
+    ui/src/dialogs/ParkDialog.cpp
+    ui/src/dialogs/ExitDialog.cpp
+    
+    ui/include/mainWindow.h
+    ui/include/ParkingGrid.h
+    ui/include/dialogs/ParkDialog.h
+    ui/include/dialogs/ExitDialog.h
 )
 
 target_include_directories(ParkingLotSystem PRIVATE
     include
-    ui
+    ui/include
 )
 
 target_link_libraries(ParkingLotSystem PRIVATE

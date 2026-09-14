@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QPushButton>
 #include <QLabel>
 
 #include "Vehicle.h"
@@ -13,15 +12,16 @@
 using namespace std;
 
 class ParkingManager;
+class ParkingGrid;
 
 class MainWindow : public QMainWindow, public ParkingObserver{
     ParkingManager* parkingManager;
+    ParkingGrid* parkingGrid;
     ParkingSpotStrategy* firstAvailableStrategy;
     ParkingSpotStrategy* nearestStrategy;
     PricingStrategy* hourlyPricingStrategy;
     PricingStrategy* flatRatePricingStrategy;
 
-    map<string, QPushButton*> spotButtons;
     vector<Vehicle*> vehicles;
 
     QLabel* totalLabel;
@@ -29,8 +29,6 @@ class MainWindow : public QMainWindow, public ParkingObserver{
     QLabel* availableLabel;
 
     void refreshStatistics();
-    void refreshSpot(std::string spotId);
-    
     void parkVehicle();
     void exitVehicle();
     void searchVehicle();
