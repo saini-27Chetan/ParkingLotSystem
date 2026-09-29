@@ -25,9 +25,16 @@ ParkingSpot* NearestSpot::findSpot(vector<ParkingSpot*>& spots, string vehicleTy
             continue;
 
         Position position = spot->getPosition();
-        double dx = position.x - entranceX;
-        double dy = position.y - entranceY;
-        double distance = sqrt(dx * dx + dy * dy);
+
+        // Eucledian Distance
+        // double dx = position.x - entranceX;
+        // double dy = position.y - entranceY;
+        // double distance = sqrt(dx * dx + dy * dy);
+        
+        // Manhattan Distance
+        double dx = abs(position.x - entranceX);
+        double dy = abs(position.y - entranceY);
+        double distance = dx + dy;
 
         if(distance < minimumDistance){
             minimumDistance = distance;
