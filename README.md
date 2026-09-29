@@ -78,7 +78,7 @@ The system supports two parking allocation strategies.
 
 ### Nearest Available Spot
 
-`NearestSpot` selects the compatible available spot closest to the parking entrance using the spot position and Euclidean distance.
+`NearestSpot` selects the compatible available spot closest to the parking entrance using the spot position and Manhattan distance.
 
 The parking entrance is represented at:
 
